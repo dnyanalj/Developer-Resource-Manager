@@ -160,6 +160,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
             });       
 
         } catch (error) {
+            console.error("Error while adding note:", error); // Add this line
             return res.status(500).json({
                 error: true,
                 message: "Internal Server Error",
