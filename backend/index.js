@@ -16,6 +16,8 @@ app.use(express.json());
 const jwt=require("jsonwebtoken");
 const {authenticateToken}=require("./utilities")
 
+const { encrypt, decrypt } = require("./utils/encryption"); // Adjust path if needed
+
 // Middleware
 app.use(cors({
     origin:"*",
@@ -168,11 +170,51 @@ app.post("/add-note", authenticateToken, async (req, res) => {
         }    
     });
 
+//encrypted option but we are doing encryption at model level when note.save() runs.....
+
+// app.post("/add-note", authenticateToken, async (req, res) => {
+//     const { title, content, tags } = req.body;
+//     const { user } = req.user;
+
+//     if (!title) {
+//         return res.status(400).json({ error: true, message: "Title is required" });
+//     }
+
+//     if (!content) {
+//         return res.status(400).json({ error: true, message: "Content is required" });
+//     }
+
+//     try {
+//         const encryptedContent = encrypt(content); // Encrypt content before saving
+
+//         const note = new Note({
+//             title,
+//             content: encryptedContent,
+//             tags: tags || [],
+//             userId: user._id,
+//         });
+
+//         await note.save();
+
+//         return res.json({
+//             error: false,
+//             note,
+//             message: "Note added successfully",
+//         });
+
+//     } catch (error) {
+//         console.error("Error while adding note:", error);
+//         return res.status(500).json({
+//             error: true,
+//             message: "Internal Server Error",
+//         });
+//     }
+// });
+
 app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
         const noteId = req.params.noteId;
         const { title, content, tags, isPinned } = req.body;
         const { user } = req.user;
-    
         if (!title && !content && !tags) {
             return res
                 .status(400)
@@ -180,7 +222,6 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
         }
         try {
             const note = await Note.findOne({ _id: noteId, userId: user._id });
-        
             if (!note) {
                 return res.status(404).json({ error: true, message: "Note not found" });
             }
@@ -204,15 +245,22 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     });
 
 // Get All Notes
+
 app.get("/get-all-notes/", authenticateToken, async (req, res) => {
     const { user } = req.user;
 
     try {
         const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
 
+        // Decrypt content before sending response
+        const decryptedNotes = notes.map(note => ({
+            ...note.toObject(), // Convert Mongoose document to plain object
+            content: note.getDecryptedContent(),  // Call the decryption method
+        }));
+
         return res.json({
             error: false,
-            notes,
+            notes: decryptedNotes,  // Send decrypted notes
             message: "All notes retrieved successfully",
         });
     } catch (error) {
@@ -222,8 +270,31 @@ app.get("/get-all-notes/", authenticateToken, async (req, res) => {
         });
     }
 });
+// normal
+// app.get("/get-all-notes/", authenticateToken, async (req, res) => {
+//     const { user } = req.user;
+
+//     try {
+//         const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
+
+//         return res.json({
+//             error: false,
+//             notes,
+//             message: "All notes retrieved successfully",
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             error: true,
+//             message: "Internal Server Error",
+//         });
+//     }
+// });
+
+
+
 
 // Delete Note
+
 app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
     const {user} = req.user;
@@ -308,6 +379,7 @@ app.get("/search-notes/", authenticateToken, async (req, res) => {
         })
     }
 });
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

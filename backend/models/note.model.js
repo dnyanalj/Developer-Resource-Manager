@@ -12,6 +12,7 @@ const noteSchema = new Schema({
     createdOn: { type: Date, default: new Date().getTime() },
 });
 
+
 // Encrypt content before saving
 noteSchema.pre("save", function (next) {
     if (this.isModified("content")) {
@@ -30,3 +31,4 @@ noteSchema.methods.getDecryptedContent = function () {
 };
 
 module.exports = mongoose.model("Note", noteSchema);
+
