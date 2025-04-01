@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import ProfileInfo from '../Cards/ProfileInfo'
 import { useNavigate } from 'react-router-dom'
 import SearchBar from '../SearchBar/SearchBar';
+import { Link } from "react-router-dom";
 
-const Navbar = ({userInfo,onSearchNote,handleClearSearch}) => {
+const Navbar = ({userInfo,onSearchNote,handleClearSearch,LoginSignupPage}) => {
 
     const [searchQuery,setSearchQuery]=useState("");
 
@@ -26,6 +27,7 @@ const Navbar = ({userInfo,onSearchNote,handleClearSearch}) => {
 return (
     <div>
         <div className='bg-white flex items-center justify-between px-6 py-2 drop-shadow'>
+            
             <h2 className='text-xl font-medium text-black py-2'>Developer Resource Manager</h2>
 
             <SearchBar
@@ -37,11 +39,21 @@ return (
             onClearSearch={onClearSearch}
             ></SearchBar>
 
-            <ProfileInfo userInfo={userInfo} onLogout={onLogout}></ProfileInfo>
-
-            {/* {userInfo?(<ProfileInfo userInfo={userInfo} onLogout={onLogout}></ProfileInfo>):(
-                <h1>hi</h1>
-                )} */}
+            {/* <ProfileInfo userInfo={userInfo} onLogout={onLogout}></ProfileInfo> */}
+            
+            {userInfo && userInfo.fullName ? (
+                <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+            ) : (
+                LoginSignupPage === "loginpage" ? (
+                    <Link to="/signup" className="btn-primary px-4 py-1 text-sm w-auto">
+                        Signup
+                    </Link>
+                ) : (
+                    <Link to="/login" className="btn-primary px-4 py-1 text-sm w-auto">
+                        Login
+                    </Link>
+                )
+            )}
         </div>
     </div>
 )

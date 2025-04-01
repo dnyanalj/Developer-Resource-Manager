@@ -54,9 +54,10 @@ const Login = () => {
     }
   return (
     <>
-    <Navbar userInfo={{}} />
+    <Navbar userInfo={{}} LoginSignupPage={"loginpage"} />
+
     <div className='flex items-center justify-center mt-28'>
-       
+
             <div className='w-96 border rounded bg-white px-7 py-10'>
                 <form onSubmit={handleLogin}>
                     <h4 className='text-2xl mb-7'>Login</h4>
@@ -67,6 +68,7 @@ const Login = () => {
                         setEmail(e.target.value);
                     }}
                     />
+
                     <PasswordInput
                     value={password}
                     onChange={(e)=>{
@@ -79,12 +81,14 @@ const Login = () => {
                     <button type='submit' className='btn-primary'>
                         Login
                     </button>
+
                     <p className='text-sm text-center mt-4'>
                         Not registered yet ?  {" "}
                         <Link to="/signup" className="font-medium text-primary underline">
                             Create an Account
                         </Link>
                     </p>
+
                 </form>
             </div>
     </div>
