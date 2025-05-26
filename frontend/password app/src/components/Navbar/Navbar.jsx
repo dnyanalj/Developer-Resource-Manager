@@ -30,7 +30,13 @@ return (
             
             <h2 className='text-xl font-medium text-black py-2'>Developer Resource Manager</h2>
 
-            <SearchBar
+
+            
+            
+
+
+            {userInfo && userInfo.fullName ? (
+                <SearchBar
             value={searchQuery}
             onChange={({target})=>{
                 setSearchQuery(target.value);
@@ -38,6 +44,12 @@ return (
             handleSearch={handleSearch}
             onClearSearch={onClearSearch}
             ></SearchBar>
+            
+            ) : (
+                <div className="text-gray-500 italic text-sm">
+                    Welcome to DRM! Please log in to access more features.
+                </div>
+            )}
 
             {/* <ProfileInfo userInfo={userInfo} onLogout={onLogout}></ProfileInfo> */}
             
